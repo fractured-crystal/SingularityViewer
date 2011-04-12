@@ -519,6 +519,7 @@ LLImportObject::LLImportObject(std::string id, LLSD prim)
 		LLSculptParams sculpt = *wat;
 		setParameterEntry(LLNetworkData::PARAMS_SCULPT, sculpt, true);
 		setParameterEntryInUse(LLNetworkData::PARAMS_SCULPT, TRUE, true);
+		mTextures.push_back(wat->getSculptTexture());
 	}
 	// Textures
 	LLSD textures = prim["textures"];

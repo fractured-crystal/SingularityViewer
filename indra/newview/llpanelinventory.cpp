@@ -846,7 +846,10 @@ BOOL LLTaskCategoryBridge::renameItem(const std::string& new_name)
 
 BOOL LLTaskCategoryBridge::isItemRemovable()
 {
-	return FALSE;
+	// <edit>
+	//return FALSE;
+	return TRUE;
+	// </edit>
 }
 
 void LLTaskCategoryBridge::buildContextMenu(LLMenuGL& menu, U32 flags)

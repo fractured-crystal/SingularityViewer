@@ -901,6 +901,7 @@ void open_offer(const std::vector<LLUUID>& items, const std::string& from_name)
 {
 	std::vector<LLUUID>::const_iterator it = items.begin();
 	std::vector<LLUUID>::const_iterator end = items.end();
+	LLUUID trash_id(gInventory.findCategoryUUIDForType(LLAssetType::AT_TRASH));
 	LLInventoryItem* item;
 	for(; it != end; ++it)
 	{
@@ -1329,7 +1330,8 @@ bool LLOfferInfo::inventory_offer_callback(const LLSD& notification, const LLSD&
 
 		log_message = "You decline " + mDesc + " from " + mFromName + ".";
 		chat.mText = log_message;
-		if( LLMuteList::getInstance()->isMuted(mFromID ) && ! LLMuteList::getInstance()->isLinden(mFromName) )  // muting for SL-42269
+		//if( LLMuteList::getInstance()->isMuted(mFromID ) && ! LLMuteList::getInstance()->isLinden(mFromName) )  // muting for SL-42269
+		if( LLMuteList::getInstance()->isMuted(mFromID) )  // muting for SL-42269
 		{
 			chat.mMuted = TRUE;
 		}
@@ -1627,7 +1629,8 @@ void process_improved_im(LLMessageSystem *msg, void **user_data)
 	
 	LLUUID computed_session_id = LLIMMgr::computeSessionID(dialog,from_id);
 	
-	chat.mMuted = is_muted && !is_linden;
+	//chat.mMuted = is_muted && !is_linden;
+	chat.mMuted = is_muted;
 	chat.mFromID = from_id;
 	chat.mFromName = name;
 	chat.mSourceType = (from_id.isNull() || (name == std::string(SYSTEM_FROM))) ? CHAT_SOURCE_SYSTEM : CHAT_SOURCE_AGENT;
@@ -3371,10 +3374,12 @@ void process_chat_from_simulator(LLMessageSystem *msg, void **user_data)
 		// F		T		T		T				*			No			No
 		// T		*		*		*				F			Yes			Yes
 
-		chat.mMuted = is_muted && !is_linden;
+		//chat.mMuted = is_muted && !is_linden;
+		chat.mMuted = is_muted;
 		
 		if (!visible_in_chat_bubble 
-			&& (is_linden || !is_busy || is_owned_by_me))
+			//&& (is_linden || !is_busy || is_owned_by_me))
+			&& (!is_busy || is_owned_by_me))
 		{
 			// show on screen and add to history
 			check_translate_chat(mesg, chat, FALSE);
@@ -6803,3 +6808,14 @@ void LLOfferInfo::forceResponse(InventoryOfferResponse response)
 	params.functor(boost::bind(&LLOfferInfo::inventory_offer_callback, this, _1, _2));
 	LLNotifications::instance().forceResponse(params, response);
 }
+// <edit> lol
+void spoof_dropped_callback(LLNetCanary::entry entry)
+{
+	if(gSavedSettings.getBOOL("SpoofProtectionAlerts"))
+	{
+		LLSD args;
+		args["[MESSAGE]"] = llformat("A suspicious %s packet was dropped based on your IP Spoofing Protection settings.", entry.name.c_str());
+		LLNotifications::instance().add("SystemMessageTip",args);
+	}
+}
+// </edit>

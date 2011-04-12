@@ -23,4 +23,14 @@
 	     mouse_opaque="true" name="Sound play btn" scale_image="true"
 	     sound_flags="0" tool_tip="Play this sound so that others can hear it."
 	     width="120" />
+	<button bottom_delta="-23" enabled="true" font="SansSerif" halign="center" height="19"
+	     label="Play Ambient" label_selected="Play Ambient" left_delta="0"
+	     mouse_opaque="true" name="Play ambient btn" scale_image="true"
+	     sound_flags="0" tool_tip="Play Ambient"
+	     width="120" />
+	<button bottom_delta="0" enabled="true" font="SansSerif" halign="center" height="19"
+	     label="Copy UUID" label_selected="Copy UUID" left_delta="126"
+	     mouse_opaque="true" name="Sound copy uuid btn" scale_image="true"
+	     sound_flags="0" tool_tip="Copy asset UUID"
+	     width="120" />
 </floater>

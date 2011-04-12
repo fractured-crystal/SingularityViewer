@@ -111,8 +111,6 @@ protected:
 	static void onBtnLeave(void* userdata);
 	static void onBtnSearch(void* userdata);
 	static void onBtnVote(void* userdata);
-	static void onBtnInvite(void* userdata);
-	static void onBtnTitles(void* userdata);
 	static void onDoubleClickGroup(void* userdata);
 
 	void create();
@@ -122,8 +120,6 @@ protected:
 	void leave();
 	void search();
 	void callVote();
-	void invite();
-	void titles();
 
 	static bool callbackLeaveGroup(const LLSD& notification, const LLSD& response);
 

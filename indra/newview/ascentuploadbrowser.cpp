@@ -36,14 +36,12 @@ ASFloaterUploadBrowser* ASFloaterUploadBrowser::sInstance = NULL;
 
 
 ///----------------------------------------------------------------------------
-/// Class ASFloaterUploadBrowser
+/// Class LLFloaterAbout
 ///----------------------------------------------------------------------------
 
 // Default constructor
 ASFloaterUploadBrowser::ASFloaterUploadBrowser() 
-:	LLFloater(std::string("floater_upload_browser"), 
-		std::string("FloaterUploadRect"), 
-		LLStringUtil::null)
+:	LLFloater(std::string("floater_upload_browser"), std::string("FloaterUploadRect"), LLStringUtil::null)
 {	
 	LLUICtrlFactory::getInstance()->buildFloater(this, "floater_upload_browser.xml");
 
@@ -187,8 +185,6 @@ void ASFloaterUploadBrowser::refreshUploadOptions()
 					llinfos << "Selected multiple files." << llendl;
 					name = "(Multiple)";
 					show_multiple = true;
-					/*LLButton* expand_button = getChild<LLButton>("expand_collapse_btn");
-					expand_button->setLabelArg("[COST]", std::string(mFileList->getAllSelected().size() * 10));*/
 					childSetValue("multiple_uploads_label", "Multiple files selected. Total cost is: " + llformat("%d", mFileList->getAllSelected().size() * 10));
 				}
 				else

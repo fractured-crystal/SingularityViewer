@@ -38,8 +38,8 @@
 
 const F32 MAX_OBJECT_Z 		= 4096.f; // should match REGION_HEIGHT_METERS, Pre-havok4: 768.f
 const F32 MIN_OBJECT_Z 		= -256.f;
-const F32 DEFAULT_MAX_PRIM_SCALE = 256.f;
-const F32 MIN_PRIM_SCALE = 0.01f;
+const F32 DEFAULT_MAX_PRIM_SCALE = 1000.f;
+const F32 MIN_PRIM_SCALE = 0.001f;
 const F32 MAX_PRIM_SCALE = 65536.f;	// something very high but not near FLT_MAX
 
 

@@ -820,6 +820,12 @@ void init_menus()
 											&handle_sounds_explorer, NULL));
 	menu->append(new LLMenuItemCallGL(	"Asset Blacklist",
 											&handle_blacklist, NULL));
+		menu->append(new LLMenuItemCallGL(	"Reopen with Hex Editor", 
+											&handle_reopen_with_hex_editor, NULL));	
+		menu->append(new LLMenuItemCallGL(	"Local Assets...",
+												&handle_local_assets, NULL));
+		menu->append(new LLMenuItemCallGL(	"VFS Explorer",
+												&handle_vfs_explorer, NULL));
 	
 	
 	
@@ -1018,7 +1024,9 @@ void init_client_menu(LLMenuGL* menu)
 
 // <dogmode> 
 #ifdef TOGGLE_HACKED_GODLIKE_VIEWER
-	if (!LLViewerLogin::getInstance()->isInProductionGrid())
+	// <edit>
+	//if (!LLViewerLogin::getInstance()->isInProductionGrid())
+	// </edit>
 	{
 		menu->append(new LLMenuItemCheckGL("Hacked Godmode",
 										   &handle_toggle_hacked_godmode,
@@ -2242,6 +2250,103 @@ class LLObjectDerender : public view_listener_t
 		return true;
 	}
 };
+//<PARTICLE>
+class LLObjectParticle : public view_listener_t
+{
+    bool handleEvent(LLPointer<LLEvent> event, const LLSD& userdata)
+    {
+        for (LLObjectSelection::valid_iterator iter = LLSelectMgr::getInstance()->getSelection()->valid_begin();
+             iter != LLSelectMgr::getInstance()->getSelection()->valid_end(); iter++)
+        {
+            LLSelectNode* node = *iter;
+            if(node->getObject()->isParticleSource())
+            {
+                LLPartSysData thisPartSysData = node->getObject()->mPartSourcep->mPartSysData;
+
+                std::ostringstream script_stream;
+                std::string flags_st="( 0 ";
+                std::string pattern_st="";
+
+                if (thisPartSysData.mPartData.mFlags & LLPartData::LL_PART_INTERP_COLOR_MASK)
+                    flags_st.append("\n\t\t\t\t|PSYS_PART_INTERP_COLOR_MASK");
+                if (thisPartSysData.mPartData.mFlags & LLPartData::LL_PART_INTERP_SCALE_MASK)
+                    flags_st.append("\n\t\t\t\t|PSYS_PART_INTERP_SCALE_MASK");
+                if (thisPartSysData.mPartData.mFlags & LLPartData::LL_PART_BOUNCE_MASK)
+                    flags_st.append("\n\t\t\t\t|PSYS_PART_BOUNCE_MASK");
+                if (thisPartSysData.mPartData.mFlags & LLPartData::LL_PART_WIND_MASK)
+                    flags_st.append("\n\t\t\t\t|PSYS_PART_WIND_MASK\n");
+                if (thisPartSysData.mPartData.mFlags & LLPartData::LL_PART_FOLLOW_SRC_MASK)
+                    flags_st.append("\n\t\t\t\t|PSYS_PART_FOLLOW_SRC_MASK");
+                if (thisPartSysData.mPartData.mFlags & LLPartData::LL_PART_FOLLOW_VELOCITY_MASK)
+                    flags_st.append("\n\t\t\t\t|PSYS_PART_FOLLOW_VELOCITY_MASK");
+                if (thisPartSysData.mPartData.mFlags & LLPartData::LL_PART_TARGET_POS_MASK)
+                    flags_st.append("\n\t\t\t\t|PSYS_PART_TARGET_POS_MASK");
+                if (thisPartSysData.mPartData.mFlags & LLPartData::LL_PART_TARGET_LINEAR_MASK)
+                    flags_st.append("\n\t\t\t\t|PSYS_PART_TARGET_LINEAR_MASK");
+                if (thisPartSysData.mPartData.mFlags & LLPartData::LL_PART_EMISSIVE_MASK)
+                    flags_st.append("\n\t\t\t\t|PSYS_PART_EMISSIVE_MASK");
+
+                switch (thisPartSysData.mPattern)
+                {
+                    case 0x01:    pattern_st=" PSYS_SRC_PATTERN_DROP ";        break;
+                    case 0x02:    pattern_st=" PSYS_SRC_PATTERN_EXPLODE ";    break;
+                    case 0x04:    pattern_st=" PSYS_SRC_PATTERN_ANGLE ";        break;
+                    case 0x08:    pattern_st=" PSYS_SRC_PATTERN_ANGLE_CONE ";    break;
+                    case 0x10:    pattern_st=" PSYS_SRC_PATTERN_ANGLE_CONE_EMPTY ";    break;// ty erscal
+                    default:    pattern_st="0";                    break;
+                }
+
+                script_stream << "// *****Reverse Particle*****\n";
+                script_stream << "default\n";
+                script_stream << "{\n";
+                script_stream << "\tstate_entry()\n";
+                script_stream << "\t{\n";
+                script_stream << "\t\tllParticleSystem([\n";
+                script_stream << "\t\t\tPSYS_PART_FLAGS," << flags_st << " ), \n";
+                script_stream << "\t\t\tPSYS_SRC_PATTERN," << pattern_st  << ",\n";
+                script_stream << "\t\t\tPSYS_PART_START_ALPHA," << thisPartSysData.mPartData.mStartColor.mV[3] << ",\n";
+                script_stream << "\t\t\tPSYS_PART_END_ALPHA," << thisPartSysData.mPartData.mEndColor.mV[3] << ",\n";
+                script_stream << "\t\t\tPSYS_PART_START_COLOR,<"<<thisPartSysData.mPartData.mStartColor.mV[0] << ",";
+                script_stream << thisPartSysData.mPartData.mStartColor.mV[1] << ",";
+                script_stream << thisPartSysData.mPartData.mStartColor.mV[2] << "> ,\n";
+                script_stream << "\t\t\tPSYS_PART_END_COLOR,<"<<thisPartSysData.mPartData.mEndColor.mV[0] << ",";
+                script_stream << thisPartSysData.mPartData.mEndColor.mV[1] << ",";
+                script_stream << thisPartSysData.mPartData.mEndColor.mV[2] << "> ,\n";
+                script_stream << "\t\t\tPSYS_PART_START_SCALE,<" << thisPartSysData.mPartData.mStartScale.mV[0] << ",";
+                script_stream << thisPartSysData.mPartData.mStartScale.mV[1] << ",0>,\n";
+                script_stream << "\t\t\tPSYS_PART_END_SCALE,<" << thisPartSysData.mPartData.mEndScale.mV[0] << ",";
+                script_stream << thisPartSysData.mPartData.mEndScale.mV[1] << ",0>,\n";
+                script_stream << "\t\t\tPSYS_PART_MAX_AGE," << thisPartSysData.mPartData.mMaxAge << ",\n";
+                script_stream << "\t\t\tPSYS_SRC_MAX_AGE," <<  thisPartSysData.mMaxAge << ",\n";
+                script_stream << "\t\t\tPSYS_SRC_ACCEL,<"<<  thisPartSysData.mPartAccel.mV[0] << ",";
+                script_stream << thisPartSysData.mPartAccel.mV[1] << ",";
+                script_stream << thisPartSysData.mPartAccel.mV[2] << ">,\n";
+                script_stream << "\t\t\tPSYS_SRC_BURST_PART_COUNT," << (U32) thisPartSysData.mBurstPartCount << ",\n";
+                script_stream << "\t\t\tPSYS_SRC_BURST_RADIUS," << thisPartSysData.mBurstRadius << ",\n";
+                script_stream << "\t\t\tPSYS_SRC_BURST_RATE," << thisPartSysData.mBurstRate << ",\n";
+                script_stream << "\t\t\tPSYS_SRC_BURST_SPEED_MIN," << thisPartSysData.mBurstSpeedMin << ",\n";
+                script_stream << "\t\t\tPSYS_SRC_BURST_SPEED_MAX," << thisPartSysData.mBurstSpeedMax << ",\n";
+                script_stream << "\t\t\tPSYS_SRC_ANGLE_BEGIN," << thisPartSysData.mInnerAngle << ",\n";
+                script_stream << "\t\t\tPSYS_SRC_ANGLE_END," << thisPartSysData.mOuterAngle << ",\n";
+                script_stream << "\t\t\tPSYS_SRC_OMEGA,<" << thisPartSysData.mAngularVelocity.mV[0]<< ",";
+                script_stream << thisPartSysData.mAngularVelocity.mV[1] << ",";
+                script_stream << thisPartSysData.mAngularVelocity.mV[2] << ">,\n";
+                script_stream << "\t\t\tPSYS_SRC_TEXTURE, (key)\"" << node->getObject()->mPartSourcep->getImage()->getID()<< "\",\n";
+                script_stream << "\t\t\tPSYS_SRC_TARGET_KEY, (key)\"" << thisPartSysData.mTargetUUID << "\"\n";
+                script_stream << " \t\t]);\n";
+                script_stream << "\t}\n";
+                script_stream << "}\n";
+
+                LLChat chat("\nReverse engineering Script has been copied in your clipboard, past it in a new script\n");
+                LLFloaterChat::addChat(chat);
+
+                gViewerWindow->mWindow->copyTextToClipboard(utf8str_to_wstring(script_stream.str()));
+            }
+        }
+        return true;
+    }
+};
+//</PARTICLE> 
 
 
 //---------------------------------------------------------------------------
@@ -2528,6 +2633,27 @@ class LLObjectCopyUUID : public view_listener_t
 		{
 			gViewerWindow->mWindow->copyTextToClipboard(utf8str_to_wstring(object->getID().asString()));
 		}
+		return true;
+	}
+};
+
+class LLObjectEnableSaveAs : public view_listener_t
+{
+	bool handleEvent(LLPointer<LLEvent> event, const LLSD& userdata)
+	{
+		LLViewerObject* object = LLSelectMgr::getInstance()->getSelection()->getPrimaryObject();
+		bool new_value = (object != NULL);
+		gMenuHolder->findControl(userdata["control"].asString())->setValue(new_value);
+		return true;
+	}
+};
+
+class LLObjectSaveAs : public view_listener_t
+{
+	bool handleEvent(LLPointer<LLEvent> event, const LLSD& userdata)
+	{
+		LLFloaterExport* floater = new LLFloaterExport();
+		floater->center();
 		return true;
 	}
 };
@@ -3641,7 +3767,19 @@ void process_grant_godlike_powers(LLMessageSystem* msg, void**)
 
 void handle_reopen_with_hex_editor(void*)
 {
-
+	LLFloater* top = gFloaterView->getFrontmost();
+	if (top)
+	{
+		LLUUID item_id = top->getItemID();
+		if(item_id.notNull())
+		{
+			LLInventoryItem* item = gInventory.getItem(item_id);
+			if(item)
+			{
+				DOFloaterHex::show(item_id);
+			}
+		}
+	}
 }
 
 void handle_open_message_log(void*)
@@ -3656,12 +3794,12 @@ void handle_edit_ao(void*)
 
 void handle_local_assets(void*)
 {
-
+	LLFloaterVFS::show();
 }
 
 void handle_vfs_explorer(void*)
 {
-
+	LLFloaterVFSExplorer::show();
 }
 
 void handle_sounds_explorer(void*)
@@ -5351,16 +5489,16 @@ class LLToolsLink : public view_listener_t
 			return true;
 		}
 
-		S32 object_count = LLSelectMgr::getInstance()->getSelection()->getObjectCount();
-		if (object_count > MAX_CHILDREN_PER_TASK + 1)
-		{
-			LLSD args;
-			args["COUNT"] = llformat("%d", object_count);
-			int max = MAX_CHILDREN_PER_TASK+1;
-			args["MAX"] = llformat("%d", max);
-			LLNotifications::instance().add("UnableToLinkObjects", args);
-			return true;
-		}
+//		S32 object_count = LLSelectMgr::getInstance()->getSelection()->getObjectCount();
+//		if (object_count > MAX_CHILDREN_PER_TASK + 1)
+//		{
+//			LLSD args;
+//			args["COUNT"] = llformat("%d", object_count);
+//			int max = MAX_CHILDREN_PER_TASK+1;
+//			args["MAX"] = llformat("%d", max);
+//	    	LLNotifications::instance().add("UnableToLinkObjects", args);
+//			return true;
+//		}
 
 		if(LLSelectMgr::getInstance()->getSelection()->getRootObjectCount() < 2)
 		{
@@ -10414,7 +10552,7 @@ void initialize_menus()
 	addMenu(new LLSelfEnableRemoveAllAttachments(), "Self.EnableRemoveAllAttachments");
 
 	 // Avatar pie menu
-
+    addMenu(new LLObjectParticle(), "Object.Particle");
 
 	addMenu(new LLObjectMute(), "Avatar.Mute");
 	addMenu(new LLAvatarAddFriend(), "Avatar.AddFriend");
@@ -10446,6 +10584,7 @@ void initialize_menus()
 	addMenu(new LLObjectReportAbuse(), "Object.ReportAbuse");
 	addMenu(new LLObjectReportAbuse(), "Object.ReportAbuse");
 	// <edit>
+	addMenu(new LLObjectSaveAs(), "Object.SaveAs");
 	addMenu(new LLObjectImport(), "Object.Import");
 	addMenu(new LLObjectMeasure(), "Object.Measure");
 	addMenu(new LLObjectData(), "Object.Data");
@@ -10470,6 +10609,7 @@ void initialize_menus()
 	addMenu(new LLObjectEnableReturn(), "Object.EnableReturn");
 	addMenu(new LLObjectEnableReportAbuse(), "Object.EnableReportAbuse");
 	// <edit>
+	addMenu(new LLObjectEnableSaveAs(), "Object.EnableSaveAs");
 	addMenu(new LLObjectEnableImport(), "Object.EnableImport");
 	// </edit>
 	addMenu(new LLObjectEnableMute(), "Object.EnableMute");

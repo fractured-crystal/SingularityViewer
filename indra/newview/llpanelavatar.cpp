@@ -262,11 +262,11 @@ void LLPanelAvatarSecondLife::clearControls()
 	{
 		group_list->deleteAllItems();
 	}
-	/*LLScrollListCtrl*	ratings_list = getChild<LLScrollListCtrl>("ratings"); createDummyWidget Making Dummy -HgB
+	LLScrollListCtrl*	ratings_list = getChild<LLScrollListCtrl>("ratings"); 
 	if(ratings_list)
 	{
 		ratings_list->deleteAllItems();
-	}*/
+	}
 
 }
 

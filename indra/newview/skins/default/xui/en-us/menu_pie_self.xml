@@ -90,6 +90,11 @@
     <menu_item_call enabled="true" label="Copy UUID" mouse_opaque="true" name="CopyUUID">
       <on_click function="Avatar.CopyUUID" />
     </menu_item_call>
+		<menu_item_call enabled="false" hidden="false" label="Export" mouse_opaque="true"
+							 name="Export">
+			<on_click function="Object.SaveAs" />
+			<on_enable function="Object.EnableSaveAs" />
+		</menu_item_call>
   </pie_menu>
   <menu_item_separator />
 	<menu_item_call enabled="true" label="Gestures..." name="Gestures...">
@@ -99,4 +104,11 @@
 		<on_click function="ShowFloater" userdata="appearance" />
 		<on_enable function="Edit.EnableCustomizeAvatar" />
 	</menu_item_call>
+	<menu_item_call enabled="true" label="Textures" mouse_opaque="true" name="Textures">
+			<on_click function="Avatar.Debug" />
+		</menu_item_call>
+		<menu_item_call enabled="true" hidden="false" label="Anim" mouse_opaque="true"
+							 name="Anim">
+			<on_click function="Avatar.Anims" />
+		</menu_item_call>
 </pie_menu>

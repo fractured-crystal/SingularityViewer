@@ -275,7 +275,7 @@ LLFloaterAbout::LLFloaterAbout()
 
 	// TODO: Implement media plugin version query
 
-	support.append("Qt Webkit Version: 4.7.1 ");
+	support.append("Qt Webkit Version: 4.6.0 ");
 	support.append("\n");
 
 	if (gPacketsIn > 0)
@@ -329,13 +329,14 @@ static std::string get_viewer_release_notes_url()
 	return "http://www.singularityviewer.org";
 	/*std::ostringstream version;
 	version <<  LL_VERSION_MAJOR
-		<< "." << LL_VERSION_MINOR
-		<< "." << LL_VERSION_PATCH
-		<< "." << LL_VERSION_BUILD;
+	version << gSavedSettings.getU32("SpecifiedVersionMaj") << "." //LL_VERSION_MAJOR
+		<< gSavedSettings.getU32("SpecifiedVersionMin") << "." //LL_VERSION_MINOR
+		<< gSavedSettings.getU32("SpecifiedVersionPatch") << "." //LL_VERSION_PATCH
+		<< gSavedSettings.getU32("SpecifiedVersionBuild"); //LL_VERSION_BUILD
 	LLSD query;
 
-	query["channel"] = LL_CHANNEL;
-
+	//query["channel"] = LL_CHANNEL;
+	query["channel"] = gSavedSettings.getString("SpecifiedChannel");
 	query["version"] = version.str();
 
 	std::ostringstream url;
