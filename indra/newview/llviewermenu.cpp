@@ -32,7 +32,7 @@
 
 #include "llviewerprecompiledheaders.h"
 
-#include "llviewermenu.h" 
+#include "llviewermenu.h"
 
 // system library includes
 #include <iostream>
@@ -126,7 +126,7 @@
 #include "llfloatergroups.h"
 
 #include "llfloaterhtmlcurrency.h"
-#include "llfloatermediabrowser.h"			// gViewerHtmlHelp
+#include "llfloatermediabrowser.h" // gViewerHtmlHelp
 #include "llfloaterhtmlsimple.h"
 #include "llfloaterhud.h"
 #include "llfloaterinspect.h"
@@ -212,9 +212,9 @@
 #include "llviewercamera.h"
 #include "llviewergenericmessage.h"
 #include "llviewergesture.h"
-#include "llviewerimagelist.h"	// gImageList
+#include "llviewerimagelist.h" // gImageList
 #include "llviewerinventory.h"
-#include "llviewermenufile.h"	// init_menu_file()
+#include "llviewermenufile.h" // init_menu_file()
 #include "llviewermessage.h"
 #include "llviewernetwork.h"
 #include "llviewerobjectlist.h"
