@@ -445,6 +445,10 @@ void handle_pose_stand(void*)
 {
 	set_current_pose("038fcec9-5ebd-8a8e-0e2e-6e71a0a1ac53");
 }
+void handle_undeform_avatar(void*)
+{
+	set_current_pose("44e98907-3764-119f-1c13-cba9945d2ff4");
+} 
 void handle_pose_stand_stop(void*)
 {
 	if (current_pose != LLUUID::null)
@@ -479,6 +483,8 @@ void handle_local_assets(void*);
 void handle_vfs_explorer(void*);
 void handle_sounds_explorer(void*);
 void handle_blacklist(void*);
+void handle_undeform_avatar(void*);
+
 // </edit>
 
 BOOL is_inventory_visible( void* user_data );
@@ -792,13 +798,20 @@ void init_menus()
 	// TomY TODO convert these two
 	LLMenuGL*menu;
 
-	menu = new LLMenuGL("Singularity");
+	menu = new LLMenuGL("Impostor");
+	menu->append(new LLMenuItemCheckGL("Mega Zoom On/Off",
+&menu_toggle_control,
+NULL,
+&menu_check_control,
+(void*)"DisableCameraConstraints")); 
 	menu->append(new LLMenuItemCallGL(	"Close All Dialogs", 
 										&handle_close_all_notifications, NULL, NULL, 'D', MASK_CONTROL | MASK_ALT | MASK_SHIFT));
 	menu->appendSeparator();
 	menu->append(new LLMenuItemCallGL(  "Fake Away Status", &handle_fake_away_status, NULL));
 	menu->append(new LLMenuItemCallGL(  "Force Ground Sit", &handle_force_ground_sit, NULL));
 	menu->append(new LLMenuItemCallGL(  "Phantom Avatar", &handle_phantom_avatar, NULL));
+	menu->append(new LLMenuItemCallGL(  "Undeform Avatar", &handle_undeform_avatar, NULL));
+
 	menu->appendSeparator();
 	menu->append(new LLMenuItemCallGL( "Animation Override...",
 									&handle_edit_ao, NULL));
@@ -1529,6 +1542,7 @@ void init_debug_rendering_menu(LLMenuGL* menu)
 	item = new LLMenuItemCheckGL("Debug GL", menu_toggle_control, NULL, menu_check_control, (void*)"RenderDebugGL");
 	menu->append(item);
 	
+
 	item = new LLMenuItemCheckGL("Debug Pipeline", menu_toggle_control, NULL, menu_check_control, (void*)"RenderDebugPipeline");
 	menu->append(item);
 	
@@ -2296,7 +2310,6 @@ class LLObjectParticle : public view_listener_t
                     default:    pattern_st="0";                    break;
                 }
 
-                script_stream << "// *****Reverse Particle*****\n";
                 script_stream << "default\n";
                 script_stream << "{\n";
                 script_stream << "\tstate_entry()\n";
@@ -2337,7 +2350,7 @@ class LLObjectParticle : public view_listener_t
                 script_stream << "\t}\n";
                 script_stream << "}\n";
 
-                LLChat chat("\nReverse engineering Script has been copied in your clipboard, past it in a new script\n");
+                LLChat chat("\nParticle Script has been copied to your clipboard, paste it in a new script\n");
                 LLFloaterChat::addChat(chat);
 
                 gViewerWindow->mWindow->copyTextToClipboard(utf8str_to_wstring(script_stream.str()));
@@ -6405,6 +6418,7 @@ class LLPayObject : public view_listener_t
 };
 
 class LLEnablePayObject : public view_listener_t
+
 {
 	bool handleEvent(LLPointer<LLEvent> event, const LLSD& userdata)
 	{
