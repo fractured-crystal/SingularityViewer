@@ -2236,6 +2236,31 @@ class LLObjectEdit : public view_listener_t
 	}
 };
 
+class LLObjectUUID : public view_listener_t
+{
+    bool handleEvent(LLPointer<LLEvent> event, const LLSD& userdata)
+    {
+        //char buffer[MAX_STRING]; /* Flawfinder: ignore */
+        //buffer[0] = '\0';
+
+        //snprintf(buffer, sizeof(buffer), "Key: %s", gLastHitObjectID.asString().c_str() );
+LLViewerObject* slct = LLSelectMgr::getInstance()->getSelection()->getFirstObject();
+if(!slct)return true;
+LLUUID key = slct->getID();
+        LLChat chat;
+chat.mText = "Key: "+key.asString();
+
+char buffer[UUID_STR_LENGTH]; /*Flawfinder: ignore*/
+key.toString(buffer);
+
+gViewerWindow->mWindow->copyTextToClipboard(utf8str_to_wstring(buffer));
+
+        chat.mSourceType = CHAT_SOURCE_SYSTEM;
+        LLFloaterChat::addChat(chat);
+        return true;
+    }
+}; 
+
 class LLObjectInspect : public view_listener_t
 {
 	bool handleEvent(LLPointer<LLEvent> event, const LLSD& userdata)
@@ -10620,6 +10645,7 @@ void initialize_menus()
 	addMenu(new LLPowerfulWizard(), "Object.Explode");
 	addMenu(new LLCanIHasKillEmAll(), "Object.EnableDestroy");
 	addMenu(new LLOHGOD(), "Object.EnableExplode");
+	addMenu(new LLObjectUUID(), "Object.UUID");
 	// </edit>
 	addMenu(new LLObjectMute(), "Object.Mute");
 	addMenu(new LLObjectBuy(), "Object.Buy");
