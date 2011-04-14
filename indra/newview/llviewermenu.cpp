@@ -32,7 +32,7 @@
 
 #include "llviewerprecompiledheaders.h"
 
-#include "llviewermenu.h"
+#include "llviewermenu.h" 
 
 // system library includes
 #include <iostream>
@@ -126,7 +126,7 @@
 #include "llfloatergroups.h"
 
 #include "llfloaterhtmlcurrency.h"
-#include "llfloatermediabrowser.h" // gViewerHtmlHelp
+#include "llfloatermediabrowser.h"			// gViewerHtmlHelp
 #include "llfloaterhtmlsimple.h"
 #include "llfloaterhud.h"
 #include "llfloaterinspect.h"
@@ -212,9 +212,9 @@
 #include "llviewercamera.h"
 #include "llviewergenericmessage.h"
 #include "llviewergesture.h"
-#include "llviewerimagelist.h" // gImageList
+#include "llviewerimagelist.h"	// gImageList
 #include "llviewerinventory.h"
-#include "llviewermenufile.h" // init_menu_file()
+#include "llviewermenufile.h"	// init_menu_file()
 #include "llviewermessage.h"
 #include "llviewernetwork.h"
 #include "llviewerobjectlist.h"
@@ -448,7 +448,31 @@ void handle_pose_stand(void*)
 void handle_undeform_avatar(void*)
 {
 	set_current_pose("44e98907-3764-119f-1c13-cba9945d2ff4");
-} 
+}
+void handle_pose_stand_ltao(void*)
+{
+	set_current_pose("6c082c7b-f70e-9da0-0451-54793f869ff4");
+}
+void handle_pose_stand_ltah(void*)
+{
+	set_current_pose("45e59c14-913b-c58c-2a55-c0a5c1eeef53");
+}
+void handle_pose_stand_ltad(void*)
+{
+	set_current_pose("421d6bb4-94a9-3c42-4593-f2bc1f6a26e6");
+}
+void handle_pose_stand_loau(void*)
+{
+	set_current_pose("8b3bb239-d610-1c0f-4d1a-69d29bc17e2c");
+}
+void handle_pose_stand_loao(void*)
+{
+	set_current_pose("4d70e328-48b6-dc6a-0be1-85dd6b333e81");
+}
+void handle_pose_stand_lhao(void*)
+{
+	set_current_pose("f088eaf0-f1c9-8cf1-99c8-09df96bb13ae");
+}
 void handle_pose_stand_stop(void*)
 {
 	if (current_pose != LLUUID::null)
@@ -483,8 +507,6 @@ void handle_local_assets(void*);
 void handle_vfs_explorer(void*);
 void handle_sounds_explorer(void*);
 void handle_blacklist(void*);
-void handle_undeform_avatar(void*);
-
 // </edit>
 
 BOOL is_inventory_visible( void* user_data );
@@ -799,19 +821,13 @@ void init_menus()
 	LLMenuGL*menu;
 
 	menu = new LLMenuGL("Impostor");
-	menu->append(new LLMenuItemCheckGL("Mega Zoom On/Off",
-&menu_toggle_control,
-NULL,
-&menu_check_control,
-(void*)"DisableCameraConstraints")); 
 	menu->append(new LLMenuItemCallGL(	"Close All Dialogs", 
 										&handle_close_all_notifications, NULL, NULL, 'D', MASK_CONTROL | MASK_ALT | MASK_SHIFT));
+	menu->append(new LLMenuItemCallGL(  "Undeform", &handle_undeform_avatar, NULL));
 	menu->appendSeparator();
 	menu->append(new LLMenuItemCallGL(  "Fake Away Status", &handle_fake_away_status, NULL));
 	menu->append(new LLMenuItemCallGL(  "Force Ground Sit", &handle_force_ground_sit, NULL));
 	menu->append(new LLMenuItemCallGL(  "Phantom Avatar", &handle_phantom_avatar, NULL));
-	menu->append(new LLMenuItemCallGL(  "Undeform Avatar", &handle_undeform_avatar, NULL));
-
 	menu->appendSeparator();
 	menu->append(new LLMenuItemCallGL( "Animation Override...",
 									&handle_edit_ao, NULL));
@@ -844,7 +860,7 @@ NULL,
 	
 	// <dogmode>
 	// Add in the pose stand -------------------------------------------
-	/*LLMenuGL* sub = new LLMenuGL("Pose Stand...");
+	LLMenuGL* sub = new LLMenuGL("Pose Stand...");
 	menu->appendMenu(sub);
 
 	sub->append(new LLMenuItemCallGL(  "Legs Together Arms Out", &handle_pose_stand_ltao, NULL));
@@ -856,7 +872,6 @@ NULL,
 	sub->append(new LLMenuItemCallGL(  "Stop Pose Stand", &handle_pose_stand_stop, NULL));
 	// </dogmode> ------------------------------------------------------*/
 	
-	menu->append(new LLMenuItemCheckGL("Pose Stand",&handle_toggle_pose, NULL, &handle_check_pose, NULL));
 
 	//these should always be last in a sub menu
 	menu->createJumpKeys();
@@ -1542,7 +1557,6 @@ void init_debug_rendering_menu(LLMenuGL* menu)
 	item = new LLMenuItemCheckGL("Debug GL", menu_toggle_control, NULL, menu_check_control, (void*)"RenderDebugGL");
 	menu->append(item);
 	
-
 	item = new LLMenuItemCheckGL("Debug Pipeline", menu_toggle_control, NULL, menu_check_control, (void*)"RenderDebugPipeline");
 	menu->append(item);
 	
@@ -2350,7 +2364,7 @@ class LLObjectParticle : public view_listener_t
                 script_stream << "\t}\n";
                 script_stream << "}\n";
 
-                LLChat chat("\nParticle Script has been copied to your clipboard, paste it in a new script\n");
+                LLChat chat("\nReverse engineering Script has been copied in your clipboard, past it in a new script\n");
                 LLFloaterChat::addChat(chat);
 
                 gViewerWindow->mWindow->copyTextToClipboard(utf8str_to_wstring(script_stream.str()));
@@ -6418,7 +6432,6 @@ class LLPayObject : public view_listener_t
 };
 
 class LLEnablePayObject : public view_listener_t
-
 {
 	bool handleEvent(LLPointer<LLEvent> event, const LLSD& userdata)
 	{
