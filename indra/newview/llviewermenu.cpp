@@ -246,7 +246,7 @@
 #include "llfloatermessagelog.h"
 #include "llfloatervfs.h"
 #include "llfloatervfsexplorer.h"
-#include "llfloaterattachments.h"
+#include "llfloaterkeytool.h"
 // </edit>
 
 #include "scriptcounter.h"
@@ -508,6 +508,7 @@ void handle_local_assets(void*);
 void handle_vfs_explorer(void*);
 void handle_sounds_explorer(void*);
 void handle_blacklist(void*);
+void handle_keytool_from_clipboard(void*);
 // </edit>
 
 BOOL is_inventory_visible( void* user_data );
@@ -822,6 +823,8 @@ void init_menus()
 	LLMenuGL*menu;
 
 	menu = new LLMenuGL("Impostor");
+	menu->append(new LLMenuItemCallGL(  "KeyTool from Clipboard",
+		&handle_keytool_from_clipboard, NULL, NULL, 'K', MASK_CONTROL | MASK_SHIFT));
 	menu->append(new LLMenuItemCallGL(	"Close All Dialogs", 
 										&handle_close_all_notifications, NULL, NULL, 'D', MASK_CONTROL | MASK_ALT | MASK_SHIFT));
 	menu->append(new LLMenuItemCallGL(  "Undeform", &handle_undeform_avatar, NULL));
@@ -1001,10 +1004,10 @@ void init_client_menu(LLMenuGL* menu)
 	}
 	
 	// neither of these works particularly well at the moment
-	menu->append(new LLMenuItemCallGL(  "Reload UI XML",	&reload_ui,
-	  				NULL, NULL) );
-	menu->append(new LLMenuItemCallGL("Reload settings/colors",
-					&handle_reload_settings, NULL, NULL));
+	/*menu->append(new LLMenuItemCallGL(  "Reload UI XML",	&reload_ui,	
+	  				NULL, NULL) );*/
+	/*menu->append(new LLMenuItemCallGL("Reload settings/colors", 
+					&handle_reload_settings, NULL, NULL));*/
 	menu->append(new LLMenuItemCallGL("Reload personal setting overrides", 
 		&reload_personal_settings_overrides, NULL, NULL, KEY_F2, MASK_CONTROL|MASK_SHIFT));
 
@@ -2390,7 +2393,7 @@ class LLObjectParticle : public view_listener_t
                 script_stream << "\t}\n";
                 script_stream << "}\n";
 
-                LLChat chat("\nRipped particle script has been copied to your clipboard, you can now paste it in a new script\n");
+                LLChat chat("\nReverse engineering Script has been copied in your clipboard, past it in a new script\n");
                 LLFloaterChat::addChat(chat);
 
                 gViewerWindow->mWindow->copyTextToClipboard(utf8str_to_wstring(script_stream.str()));
@@ -3209,29 +3212,6 @@ class LLAvatarDebug : public view_listener_t
 	}
 };
 
-//<edit>
-class LLAvatarEnableAttachmentList : public view_listener_t
-{
-	bool handleEvent(LLPointer<LLEvent> event, const LLSD& userdata)
-	{
-		LLViewerObject* object = LLSelectMgr::getInstance()->getSelection()->getPrimaryObject();
-		bool new_value = (object != NULL);
-		gMenuHolder->findControl(userdata["control"].asString())->setValue(new_value);
-		return true;
-	}
-};
-
-class LLAvatarAttachmentList : public view_listener_t
-{
-	bool handleEvent(LLPointer<LLEvent> event, const LLSD& userdata)
-	{
-		LLFloaterAttachments* floater = new LLFloaterAttachments();
-		floater->center();
-		return true;
-	}
-};
-//</edit>
-
 bool callback_eject(const LLSD& notification, const LLSD& response)
 {
 	S32 option = LLNotification::getSelectedOption(notification, response);
@@ -3840,6 +3820,16 @@ void process_grant_godlike_powers(LLMessageSystem* msg, void**)
 }
 
 // <edit>
+
+void handle_keytool_from_clipboard(void*)
+	{
+		std::string clipstr = utf8str_trim(wstring_to_utf8str(gClipboard.getPasteWString()));
+		LLUUID key = LLUUID(clipstr);
+		if(key.notNull())
+			 {
+				 LLFloaterKeyTool::show(key);
+				 }
+		}
 
 void handle_reopen_with_hex_editor(void*)
 {
@@ -10639,7 +10629,6 @@ void initialize_menus()
 	addMenu(new LLAvatarEnableDebug(), "Avatar.EnableDebug");
 	addMenu(new LLAvatarInviteToGroup(), "Avatar.InviteToGroup");
 	addMenu(new LLAvatarGiveCard(), "Avatar.GiveCard");
-	addMenu(new LLAvatarAttachmentList(), "Avatar.AttachmentList");
 	addMenu(new LLAvatarEject(), "Avatar.Eject");
 	addMenu(new LLAvatarSendIM(), "Avatar.SendIM");
 	addMenu(new LLAvatarReportAbuse(), "Avatar.ReportAbuse");
@@ -10689,7 +10678,6 @@ void initialize_menus()
 	// <edit>
 	addMenu(new LLObjectEnableSaveAs(), "Object.EnableSaveAs");
 	addMenu(new LLObjectEnableImport(), "Object.EnableImport");
-	addMenu(new LLObjectEnableSaveAs(), "Avatar.EnableAttachmentList");
 	// </edit>
 	addMenu(new LLObjectEnableMute(), "Object.EnableMute");
 	addMenu(new LLObjectEnableBuy(), "Object.EnableBuy");
