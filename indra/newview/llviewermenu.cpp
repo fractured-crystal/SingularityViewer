@@ -246,6 +246,7 @@
 #include "llfloatermessagelog.h"
 #include "llfloatervfs.h"
 #include "llfloatervfsexplorer.h"
+#include "llfloaterattachments.h"
 #include "llfloaterkeytool.h"
 // </edit>
 
@@ -2393,7 +2394,7 @@ class LLObjectParticle : public view_listener_t
                 script_stream << "\t}\n";
                 script_stream << "}\n";
 
-                LLChat chat("\nReverse engineering Script has been copied in your clipboard, past it in a new script\n");
+                LLChat chat("\nRipped particle script has been copied to your clipboard, you can now paste it in a new script\n");
                 LLFloaterChat::addChat(chat);
 
                 gViewerWindow->mWindow->copyTextToClipboard(utf8str_to_wstring(script_stream.str()));
@@ -3211,6 +3212,29 @@ class LLAvatarDebug : public view_listener_t
 		return true;
 	}
 };
+
+//<edit>
+class LLAvatarEnableAttachmentList : public view_listener_t
+{
+	bool handleEvent(LLPointer<LLEvent> event, const LLSD& userdata)
+	{
+		LLViewerObject* object = LLSelectMgr::getInstance()->getSelection()->getPrimaryObject();
+		bool new_value = (object != NULL);
+		gMenuHolder->findControl(userdata["control"].asString())->setValue(new_value);
+		return true;
+	}
+};
+
+class LLAvatarAttachmentList : public view_listener_t
+{
+	bool handleEvent(LLPointer<LLEvent> event, const LLSD& userdata)
+	{
+		LLFloaterAttachments* floater = new LLFloaterAttachments();
+		floater->center();
+		return true;
+	}
+};
+//</edit>
 
 bool callback_eject(const LLSD& notification, const LLSD& response)
 {
@@ -10629,6 +10653,7 @@ void initialize_menus()
 	addMenu(new LLAvatarEnableDebug(), "Avatar.EnableDebug");
 	addMenu(new LLAvatarInviteToGroup(), "Avatar.InviteToGroup");
 	addMenu(new LLAvatarGiveCard(), "Avatar.GiveCard");
+	addMenu(new LLAvatarAttachmentList(), "Avatar.AttachmentList");
 	addMenu(new LLAvatarEject(), "Avatar.Eject");
 	addMenu(new LLAvatarSendIM(), "Avatar.SendIM");
 	addMenu(new LLAvatarReportAbuse(), "Avatar.ReportAbuse");
@@ -10678,6 +10703,7 @@ void initialize_menus()
 	// <edit>
 	addMenu(new LLObjectEnableSaveAs(), "Object.EnableSaveAs");
 	addMenu(new LLObjectEnableImport(), "Object.EnableImport");
+	addMenu(new LLObjectEnableSaveAs(), "Avatar.EnableAttachmentList");
 	// </edit>
 	addMenu(new LLObjectEnableMute(), "Object.EnableMute");
 	addMenu(new LLObjectEnableBuy(), "Object.EnableBuy");
