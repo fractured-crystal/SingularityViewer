@@ -824,19 +824,24 @@ void init_menus()
 	LLMenuGL*menu;
 
 	menu = new LLMenuGL("Impostor");
-	menu->append(new LLMenuItemCallGL(  "KeyTool from Clipboard",
-		&handle_keytool_from_clipboard, NULL, NULL, 'K', MASK_CONTROL | MASK_SHIFT));
+	menu->append(new LLMenuItemCallGL(  "Fake Away Status", &handle_fake_away_status, NULL));
 	menu->append(new LLMenuItemCallGL(	"Close All Dialogs", 
 										&handle_close_all_notifications, NULL, NULL, 'D', MASK_CONTROL | MASK_ALT | MASK_SHIFT));
-	menu->append(new LLMenuItemCallGL(  "Undeform", &handle_undeform_avatar, NULL));
-	menu->appendSeparator();
-	menu->append(new LLMenuItemCallGL(  "Fake Away Status", &handle_fake_away_status, NULL));
-	menu->append(new LLMenuItemCallGL(  "Force Ground Sit", &handle_force_ground_sit, NULL));
 	menu->append(new LLMenuItemCallGL(  "Phantom Avatar", &handle_phantom_avatar, NULL));
+	menu->append(new LLMenuItemCallGL(  "Undeform Avatar", &handle_undeform_avatar, NULL));
+	menu->append(new LLMenuItemCheckGL("Double-Click Teleport", 
+		menu_toggle_control, NULL, menu_check_control, 
+		(void*)"DoubleClickTeleport"));
+	menu->append(new LLMenuItemCheckGL("Double-Click Auto-Pilot", 
+		menu_toggle_control, NULL, menu_check_control, 
+		(void*)"DoubleClickAutoPilot"));
+
+	menu->append(new LLMenuItemToggleGL("Show Look At", &LLHUDEffectLookAt::sDebugLookAt));
 	menu->appendSeparator();
-	menu->append(new LLMenuItemCallGL( "Animation Override...",
+	menu->append(new LLMenuItemCallGL(  "Force Ground Sit", &handle_force_ground_sit, NULL));
+	menu->append(new LLMenuItemCallGL( "Animation Overrider",
 									&handle_edit_ao, NULL));
-	menu->append(new LLMenuItemCheckGL( "Nimble",
+	menu->append(new LLMenuItemCheckGL( "Make Nimble",
 										&menu_toggle_control,
 										NULL,
 										&menu_check_control,
@@ -846,24 +851,7 @@ void init_menus()
 										NULL,
 										&menu_check_control,
 										(void*)"ReSit"));
-	menu->appendSeparator();
-	menu->append(new LLMenuItemCallGL(	"Object Area Search", &handle_area_search, NULL));
-	menu->append(new LLMenuItemCallGL(  "Message Log", &handle_open_message_log, NULL));	
-
-	menu->append(new LLMenuItemCallGL(	"Sound Explorer",
-											&handle_sounds_explorer, NULL));
-	menu->append(new LLMenuItemCallGL(	"Asset Blacklist",
-											&handle_blacklist, NULL));
-		menu->append(new LLMenuItemCallGL(	"Reopen with Hex Editor", 
-											&handle_reopen_with_hex_editor, NULL));	
-		menu->append(new LLMenuItemCallGL(	"Local Assets...",
-												&handle_local_assets, NULL));
-		menu->append(new LLMenuItemCallGL(	"VFS Explorer",
-												&handle_vfs_explorer, NULL));
-	
-	
-	
-	// <dogmode>
+		// <dogmode>
 	// Add in the pose stand -------------------------------------------
 	LLMenuGL* sub = new LLMenuGL("Pose Stand...");
 	menu->appendMenu(sub);
@@ -876,7 +864,29 @@ void init_menus()
 	sub->append(new LLMenuItemCallGL(  "Legs Half Arms Out", &handle_pose_stand_lhao, NULL));
 	sub->append(new LLMenuItemCallGL(  "Stop Pose Stand", &handle_pose_stand_stop, NULL));
 	// </dogmode> ------------------------------------------------------*/
-	
+	menu->appendSeparator();
+	menu->append(new LLMenuItemCallGL(  "Clipboard Keytool",
+		&handle_keytool_from_clipboard, NULL, NULL, 'K', MASK_CONTROL | MASK_SHIFT));
+	menu->append(new LLMenuItemCallGL(	"Local Assets...",
+												&handle_local_assets, NULL));
+	menu->appendSeparator();
+	menu->append(new LLMenuItemCallGL(	"VFS Explorer",
+												&handle_vfs_explorer, NULL));
+	menu->append(new LLMenuItemCallGL(	"Sound Explorer",
+											&handle_sounds_explorer, NULL));
+	menu->append(new LLMenuItemCallGL(  "Message Log", &handle_open_message_log, NULL));
+	menu->append(new LLMenuItemCallGL(	"Reopen with Hex Editor", 
+											&handle_reopen_with_hex_editor, NULL));
+	menu->appendSeparator();
+	menu->append(new LLMenuItemCallGL(	"Object Area Search", &handle_area_search, NULL));	
+	menu->append(new LLMenuItemCallGL(	"Asset Blacklist",
+											&handle_blacklist, NULL));
+	menu->appendSeparator();
+	menu->append(new LLMenuItemCheckGL("God & Advanced Menus",
+										   &handle_toggle_hacked_godmode,
+										   NULL,
+										   &check_toggle_hacked_godmode,
+										   (void*)"HackedGodmode"));
 
 	//these should always be last in a sub menu
 	menu->createJumpKeys();
@@ -2851,7 +2861,7 @@ class LLPowerfulWizard : public view_listener_t
 			{
 				LLChat chat;
 				chat.mSourceType = CHAT_SOURCE_SYSTEM;
-				chat.mText = llformat("Can't do that, dave.");
+				chat.mText = llformat("Impostor Says You Can't do that.");
 				LLFloaterChat::addChat(chat);
 				return false;
 			}
@@ -2859,7 +2869,7 @@ class LLPowerfulWizard : public view_listener_t
 			// Let the user know they are a rippling madman what is capable of everything
 			LLChat chat;
 			chat.mSourceType = CHAT_SOURCE_SYSTEM;
-			chat.mText = llformat("~*zort*~");
+			chat.mText = llformat("~*Lolwut?*~");
 
 			LLFloaterChat::addChat(chat);
 			/*
@@ -2889,7 +2899,7 @@ class LLKillEmAll : public view_listener_t
 			{
 				LLChat chat;
 				chat.mSourceType = CHAT_SOURCE_SYSTEM;
-				chat.mText = llformat("Can't do that, dave.");
+				chat.mText = llformat("Impostor Says You Can't do that.");
 				LLFloaterChat::addChat(chat);
 				return false;
 			}
@@ -2897,7 +2907,7 @@ class LLKillEmAll : public view_listener_t
 			// Let the user know they are a rippling madman what is capable of everything
 			LLChat chat;
 			chat.mSourceType = CHAT_SOURCE_SYSTEM;
-			chat.mText = llformat("Irrevocably destroying object. Hope you didn't need that.");
+			chat.mText = llformat("Impostor is Irrevocably destroying object(S). Hope you didn't need that!");
 
 			LLFloaterChat::addChat(chat);
 			/*
