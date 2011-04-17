@@ -47,7 +47,6 @@ public:
 	std::string mId;
 	std::string mParentId;
 	std::string mPrimName;
-	std::string mPrimDescription;
 	bool importIsAttachment;
 	U32 importAttachPoint;
 	LLVector3 importAttachPos;

@@ -7,7 +7,7 @@
 #include "llviewerprecompiledheaders.h"
 #include "llimportobject.h"
 #include "llsdserialize.h"
-#include "llsdutil_math.h"
+#include "llsdutil.h"
 #include "llviewerobject.h"
 #include "llagent.h"
 #include "llchat.h"
@@ -24,7 +24,6 @@
 #include "llfloaterperms.h"
 #include "llviewerregion.h"
 #include "llviewerobjectlist.h"
-#include "llimagej2c.h"
 
 // static vars
 bool LLXmlImport::sImportInProgress = false;
@@ -519,7 +518,9 @@ LLImportObject::LLImportObject(std::string id, LLSD prim)
 		LLSculptParams sculpt = *wat;
 		setParameterEntry(LLNetworkData::PARAMS_SCULPT, sculpt, true);
 		setParameterEntryInUse(LLNetworkData::PARAMS_SCULPT, TRUE, true);
-		mTextures.push_back(wat->getSculptTexture());
+		//<keimo solution>
+        mTextures.push_back(wat->getSculptTexture());
+       //</keimo solution>
 	}
 	// Textures
 	LLSD textures = prim["textures"];
@@ -540,10 +541,6 @@ LLImportObject::LLImportObject(std::string id, LLSD prim)
 	if(prim.has("name"))
 	{
 		mPrimName = prim["name"].asString();
-	}
-	if(prim.has("description"))
-	{
-		mPrimDescription = prim["description"].asString();
 	}
 }
 		
@@ -990,19 +987,6 @@ void LLXmlImport::onNewPrim(LLViewerObject* object)
 		gMessageSystem->nextBlockFast(_PREHASH_ObjectData);
 		gMessageSystem->addU32Fast(_PREHASH_LocalID, object->getLocalID());
 		gMessageSystem->addStringFast(_PREHASH_Name, from->mPrimName);
-		gMessageSystem->sendReliable(gAgent.getRegionHost());
-	}
-
-	//Description
-	if(from->mPrimDescription != "")
-	{
-		gMessageSystem->newMessageFast(_PREHASH_ObjectDescription);
-		gMessageSystem->nextBlockFast(_PREHASH_AgentData);
-		gMessageSystem->addUUIDFast(_PREHASH_AgentID, gAgent.getID());
-		gMessageSystem->addUUIDFast(_PREHASH_SessionID, gAgent.getSessionID());
-		gMessageSystem->nextBlockFast(_PREHASH_ObjectData);
-		gMessageSystem->addU32Fast(_PREHASH_LocalID, object->getLocalID());
-		gMessageSystem->addStringFast(_PREHASH_Description, from->mPrimDescription);
 		gMessageSystem->sendReliable(gAgent.getRegionHost());
 	}
 
