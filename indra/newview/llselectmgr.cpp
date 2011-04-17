@@ -95,6 +95,7 @@
 
 // <edit>
 #include "llfloaterexport.h"
+#include "llfloaterattachments.h"
 // </edit>
 
 #include "llglheaders.h"
@@ -2826,17 +2827,17 @@ bool LLSelectMgr::confirmDelete(const LLSD& notification, const LLSD& response, 
 										  (void*)info,
 										  SEND_ONLY_ROOTS);
 			// VEFFECT: Delete Object - one effect for all deletes
+			//simms edit
 			if(!gSavedSettings.getBOOL("DisablePointAtAndBeam"))
+			// </edit>
+			if (LLSelectMgr::getInstance()->mSelectedObjects->mSelectType != SELECT_TYPE_HUD)
 			{
-				if (LLSelectMgr::getInstance()->mSelectedObjects->mSelectType != SELECT_TYPE_HUD)
-				{
-					LLHUDEffectSpiral *effectp = (LLHUDEffectSpiral *)LLHUDManager::getInstance()->createViewerEffect(LLHUDObject::LL_HUD_EFFECT_POINT, TRUE);
-					effectp->setPositionGlobal( LLSelectMgr::getInstance()->getSelectionCenterGlobal() );
-					effectp->setColor(LLColor4U(gAgent.getEffectColor()));
-					F32 duration = 0.5f;
-					duration += LLSelectMgr::getInstance()->mSelectedObjects->getObjectCount() / 64.f;
-					effectp->setDuration(duration);
-				}
+				LLHUDEffectSpiral *effectp = (LLHUDEffectSpiral *)LLHUDManager::getInstance()->createViewerEffect(LLHUDObject::LL_HUD_EFFECT_POINT, TRUE);
+				effectp->setPositionGlobal( LLSelectMgr::getInstance()->getSelectionCenterGlobal() );
+				effectp->setColor(LLColor4U(gAgent.getEffectColor()));
+				F32 duration = 0.5f;
+				duration += LLSelectMgr::getInstance()->mSelectedObjects->getObjectCount() / 64.f;
+				effectp->setDuration(duration);
 			}
 
 			gAgent.setLookAt(LOOKAT_TARGET_CLEAR);
@@ -4400,10 +4401,6 @@ void LLSelectMgr::processObjectProperties(LLMessageSystem* msg, void** user_data
 			}
 		}
 
-		// <edit> Send to export floaters
-		LLFloaterExport::receiveObjectProperties(id, name, desc);
-		// </edit>
-
 		// Iterate through nodes at end, since it can be on both the regular AND hover list
 		struct f : public LLSelectedNodeFunctor
 		{
@@ -4483,6 +4480,12 @@ void LLSelectMgr::processObjectProperties(LLMessageSystem* msg, void** user_data
 			node->mSitName.assign(sit_name);
 			node->mTouchName.assign(touch_name);
 		}
+
+		// <edit> Send to export floaters
+		LLFloaterExport::receiveObjectProperties(id, name, desc);
+		if(!node)
+			LLFloaterAttachments::dispatchHUDObjectProperties(new LLHUDAttachment(name, desc, owner_id, id, from_task_id, texture_ids, 0, inv_serial));
+		// </edit>
 	}
 
 	dialog_refresh_all();

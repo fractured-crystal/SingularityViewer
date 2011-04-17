@@ -156,6 +156,7 @@ set(viewer_SOURCE_FILES
     llfloaterabout.cpp
     llfloateractivespeakers.cpp
     llfloateranimpreview.cpp
+	llfloaterattachments.cpp
     llfloaterauction.cpp
     llfloateravatarinfo.cpp
     llfloateravatarlist.cpp
@@ -235,6 +236,7 @@ set(viewer_SOURCE_FILES
     llfloaterteleport.cpp
     llfloaterteleporthistory.cpp
     llfloatertest.cpp
+	llfloatertextdump.cpp
     llfloatertools.cpp
     llfloatertopobjects.cpp
     llfloatertos.cpp
@@ -629,6 +631,7 @@ set(viewer_HEADER_FILES
     llfloaterabout.h
     llfloateractivespeakers.h
     llfloateranimpreview.h
+	llfloaterattachments.h
     llfloaterauction.h
     llfloateravatarinfo.h
     llfloateravatarlist.h
@@ -708,6 +711,7 @@ set(viewer_HEADER_FILES
     llfloaterteleport.h
     llfloaterteleporthistory.h
     llfloatertest.h
+	llfloatertextdump.h
     llfloatertools.h
     llfloatertopobjects.h
     llfloatertos.h
